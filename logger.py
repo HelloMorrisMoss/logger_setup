@@ -1,7 +1,7 @@
-"""Provides logging to console and a csv formatted file."""
-
 import logging
-from logging.config import dictConfig
+import sys
+
+from logging.handlers import RotatingFileHandler
 
 
 class BreadcrumbFilter(logging.Filter):
@@ -14,93 +14,53 @@ class BreadcrumbFilter(logging.Filter):
                            '%(asctime)-30s %(breadcrumbs)-35s %(levelname)s: %(message)s'}
                    }
        self.logger.debug('handle_accept() -> %s', client_info[1])
-        2020-11-08 14:04:40,561        echo_server03.handle_accept.24      DEBUG: handle_accept() -> ('127.0.0.1', 49515)
+        2020-11-08 14:04:40,561        echo_server03.handle_accept.24      DEBUG: handle_accept() -> ('127.0.0.1',
+        49515)
     """
+
     def filter(self, record):
         record.breadcrumbs = "{}.{}.{}".format(record.module, record.funcName, record.lineno)
         return True
 
 
-base_logging_config = dict(
-    version=1,
-    filters={},
-    formatters={},
-    handlers={},
-    root={},
+def setup_logger():
+    # set up the logging
+    logr = logging.getLogger()
+    logr.setLevel(logging.DEBUG)
 
-)
+    # console logger
+    c_handler = logging.StreamHandler()
+    c_handler.setLevel(logging.DEBUG)
+    c_format = logging.Formatter('%(asctime)-30s %(breadcrumbs)-45s %(levelname)s: %(message)s')
+    c_handler.setFormatter(c_format)
+    c_handler.addFilter(BreadcrumbFilter())
+    logr.addHandler(c_handler)
 
-file_logging_config = dict(
-    version=1,
-    filters={
-        'column_filter': {
-            '()': BreadcrumbFilter
-        }
-    },
-    formatters={'log_file_format':
-                {'format': '"%(asctime)s","%(breadcrumbs)s","%(funcName)s","%(lineno)d","%(levelname)s","%(message)s"'}
-              },
-    handlers={'rotating_csv_file_log_handler': {
-            'level': 'DEBUG',
-            'formatter': 'log_file_format',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'debug.log',
-            'mode': 'a',
-            'maxBytes': 1048576,
-            'backupCount': 10}
-    },
-    root={
-        'handlers': ['rotating_csv_file_log_handler'],
-        'level': logging.DEBUG,
-    },
+    # file logger
+    f_handler = RotatingFileHandler('mahlo_popup.log', maxBytes=2000000)
+    f_handler.setLevel(logging.DEBUG)
+    f_string = '"%(asctime)s","%(name)s", "%(breadcrumbs)s","%(funcName)s","%(lineno)d","%(levelname)s","%(message)s"'
+    f_format = logging.Formatter(f_string)
+    f_handler.addFilter(BreadcrumbFilter())
+    f_handler.setFormatter(f_format)
 
-)
+    # Add handlers to the logger
 
-console_logging_config = dict(
-    version=1,
-    filters={
-        'column_filter': {
-            '()': BreadcrumbFilter
-        }
-    },
-    formatters={
-        'console_format': {'format':
-                           '%(asctime)-30s %(breadcrumbs)-45s %(levelname)s: %(message)s'}
-    },
-    handlers={
-        'console_log_handler': {
-                                'class': 'logging.StreamHandler',
-                                'formatter': 'console_format',
-                                'level': logging.DEBUG,
-                                'filters': ['column_filter']}
-    },
-    root={
-        'handlers': ['console_log_handler'],
-        'level': logging.DEBUG,
-    },
-)
+    logr.addHandler(f_handler)
 
-logging_config = base_logging_config
-configs_to_use = []
+    def handle_exception(exc_type, exc_value, exc_traceback):
+        """Log unhandled exceptions."""
 
-# comment out/uncomment to add remove configs here
-##########################################
-configs_to_use += [console_logging_config]
-# configs_to_use += [file_logging_config]
-##########################################
+        if issubclass(exc_type, KeyboardInterrupt):
+            sys.__excepthook__(exc_type, exc_value, exc_traceback)
+            return
 
-# if everything is commented out, use the builtin basicConfig
-if len(configs_to_use) == 0:
-    logging.basicConfig()
-else:
-    for cfg_dct in configs_to_use:
-        for l_key, l_val in console_logging_config.items():
-            if l_key in logging_config.keys() and isinstance(l_val, dict):
-                logging_config[l_key].update(l_val)
-    logging.config.dictConfig(logging_config)
+        logr.critical("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
 
-lg = logging.getLogger()
+    sys.excepthook = handle_exception
 
-# test the logger
-if __name__ == '__main__':
-    lg.debug('often makes a very good meal of {}'.format('visiting tourists'))
+    return logr
+
+
+# protect against multiple loggers from importing in multiple files
+lg = setup_logger() if not logging.getLogger().hasHandlers() else logging.getLogger()
