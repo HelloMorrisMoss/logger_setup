@@ -23,26 +23,28 @@ class BreadcrumbFilter(logging.Filter):
         return True
 
 
-def setup_logger():
+def setup_logger(console_log=True, file_log=True):
     # set up the logging
     logr = logging.getLogger()
     logr.setLevel(logging.DEBUG)
 
-    # console logger
-    c_handler = logging.StreamHandler()
-    c_handler.setLevel(logging.DEBUG)
-    c_format = logging.Formatter('%(asctime)-30s %(breadcrumbs)-45s %(levelname)s: %(message)s')
-    c_handler.setFormatter(c_format)
-    c_handler.addFilter(BreadcrumbFilter())
-    logr.addHandler(c_handler)
+    if console_log:
+        # console logger
+        c_handler = logging.StreamHandler()
+        c_handler.setLevel(logging.DEBUG)
+        c_format = logging.Formatter('%(asctime)-30s %(breadcrumbs)-45s %(levelname)s: %(message)s')
+        c_handler.setFormatter(c_format)
+        c_handler.addFilter(BreadcrumbFilter())
+        logr.addHandler(c_handler)
 
-    # file logger
-    f_handler = RotatingFileHandler('mahlo_popup.log', maxBytes=2000000)
-    f_handler.setLevel(logging.DEBUG)
-    f_string = '"%(asctime)s","%(name)s", "%(breadcrumbs)s","%(funcName)s","%(lineno)d","%(levelname)s","%(message)s"'
-    f_format = logging.Formatter(f_string)
-    f_handler.addFilter(BreadcrumbFilter())
-    f_handler.setFormatter(f_format)
+    if file_log:
+        # file logger
+        f_handler = RotatingFileHandler('mahlo_popup.log', maxBytes=2000000)
+        f_handler.setLevel(logging.DEBUG)
+        f_string = '"%(asctime)s","%(name)s", "%(breadcrumbs)s","%(funcName)s","%(lineno)d","%(levelname)s","%(message)s"'
+        f_format = logging.Formatter(f_string)
+        f_handler.addFilter(BreadcrumbFilter())
+        f_handler.setFormatter(f_format)
 
     # Add handlers to the logger
 
