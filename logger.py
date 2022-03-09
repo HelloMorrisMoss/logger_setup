@@ -23,7 +23,7 @@ class BreadcrumbFilter(logging.Filter):
         return True
 
 
-def setup_logger(console_log=True, file_log=True):
+def setup_logger(console_log=True, file_log='logfile.log'):
     # set up the logging
     logr = logging.getLogger()
     logr.setLevel(logging.DEBUG)
@@ -39,7 +39,7 @@ def setup_logger(console_log=True, file_log=True):
 
     if file_log:
         # file logger
-        f_handler = RotatingFileHandler('mahlo_popup.log', maxBytes=2000000)
+        f_handler = RotatingFileHandler(file_log, maxBytes=2000000)
         f_handler.setLevel(logging.DEBUG)
         f_string = '"%(asctime)s","%(name)s", "%(breadcrumbs)s","%(funcName)s","%(lineno)d","%(levelname)s","%(message)s"'
         f_format = logging.Formatter(f_string)
@@ -66,3 +66,4 @@ def setup_logger(console_log=True, file_log=True):
 
 # protect against multiple loggers from importing in multiple files
 lg = setup_logger() if not logging.getLogger().hasHandlers() else logging.getLogger()
+pass
