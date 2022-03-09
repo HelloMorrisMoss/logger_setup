@@ -23,7 +23,16 @@ class BreadcrumbFilter(logging.Filter):
         return True
 
 
-def setup_logger(console_log=True, file_log='logfile.log'):
+def setup_logger(file_log='logfile.log', console_log=True):
+    """Instantiate a logger with presets.
+
+    By default logs to the console and a file in the current directory.
+
+    :param file_log: str, path to the file to write the log to. Default './logfile.log'.
+    :param console_log: bool, whether to write to the console. Default True.
+    :return: the logger
+    """
+
     # set up the logging
     logr = logging.getLogger()
     logr.setLevel(logging.DEBUG)
