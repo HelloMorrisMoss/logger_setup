@@ -74,5 +74,11 @@ def setup_logger(file_log='logfile.log', console_log=True):
 
 
 # protect against multiple loggers from importing in multiple files
-lg = setup_logger() if not logging.getLogger().hasHandlers() else logging.getLogger()
-pass
+def single_logger(*args, **kwargs):
+    """Get a the root logger if it exists with handlers, else a logger using setup_logger using any arguments."""
+    return setup_logger(*args, **kwargs) if not logging.getLogger().hasHandlers() else logging.getLogger()
+
+
+if __name__ == '__main__':
+    lg = single_logger('test_log.log')
+    pass
