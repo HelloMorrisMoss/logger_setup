@@ -2,6 +2,6 @@ from setuptools import setup
 
 setup(
     name='logger_setup',
-    version='1.0.3',
+    version='2024.06.00',
     scripts=['logger_setup.py']
     )
