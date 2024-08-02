@@ -55,7 +55,7 @@ def set_up_logger(lg=None, console_log=True, file_log=None, **kwargs):
 
     # set up the logging
     if lg is None:
-        lg = logging.getLogger('mahlo_pdf_parser')
+        lg = logging.getLogger('common_logger')
     base_log_level = logging.DEBUG if on_dev_node else logging.INFO
     lg.setLevel(base_log_level)
 

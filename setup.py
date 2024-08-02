@@ -1,7 +1,9 @@
 from setuptools import setup
 
 setup(
-    name='logger_setup',
-    version='2024.06.00',
-    scripts=['logger_setup.py']
+    name='commonlog',
+    version='2024.08.12',
+    py_modules=['logger_setup'],
+    # package_dir={'commonlog': ''},
+    # packages=['commonlog'],
     )
