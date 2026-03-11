@@ -4,6 +4,8 @@ import sys
 import uuid
 from logging.handlers import RotatingFileHandler
 
+__all__ = ['single_logger']
+
 program_unique_id = uuid.uuid4()
 
 if os.environ.get('UNITTESTING'):

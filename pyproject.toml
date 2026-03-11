@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "commonlog"
+version = "2024.09.00"
+description = "A logging library with commonly useful logging features built on Python's builtin logging library."
+authors = [
+  { name = "Your Name", email = "your.email@example.com" }
+]
+dependencies = []
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# TODO: finally got this working using:
+#  just the toml file - no setup file
+#  building the wheel like this: python -m build --no-isolation --wheel
+#  pointing the dependent project at the wheel like so, a lot of that would be unneeded if put on pipy:
+#  python -m pip install "C:\Users\lmcglaughlin\PycharmProjects\commonlog\dist\commonlog-2024.9.0-py3-none-any.whl" --no-index --force-reinstall
+#  single_logger in the root namepsace using by adding """__all__ = ['single_logger']""" to src/commonlog/__init__.py
+#packages = ["commonlog"]
+#package-dir = {"" = "src"}
+#include-package-data = true
+#include = ["pandas", "pandas.*"]
+#namespaces = false
